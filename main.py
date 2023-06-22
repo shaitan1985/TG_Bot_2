@@ -1,16 +1,14 @@
-# This is a sample Python script.
+from aiogram import Bot, Dispatcher
+from aiogram.types import Message
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import config
+from bot.handlers import commands, messages
+# Bot object and dispatcher
+bot: Bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
+dp: Dispatcher = Dispatcher()
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    commands.handlers_commands_register(dp=dp)
+    messages.handlers_messages_register(dp=dp)
+    dp.run_polling(bot)
