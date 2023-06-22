@@ -1,7 +1,6 @@
 from aiogram.types import Message, ContentType
 from aiogram import Dispatcher, F
 
-
 # for photos
 async def send_photo_echo(message: Message):
     await message.reply_photo(message.photo[0].file_id)
