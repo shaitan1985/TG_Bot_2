@@ -19,6 +19,6 @@ async def process_help_command(message: Message):
 
 
 # register all handlers
-def handlers_commands_register(dp: Dispatcher):
+def setup(dp: Dispatcher):
     dp.message.register(process_start_command, start_filter)
     dp.message.register(process_help_command, Command(commands=["help"]))

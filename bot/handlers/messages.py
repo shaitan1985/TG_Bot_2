@@ -1,5 +1,6 @@
 from aiogram.types import Message, ContentType
 from aiogram import Dispatcher, F
+from aiogram.filters import Text
 from bot.filters.simple_filters import NumbersInMessage
 
 # for photos
@@ -26,6 +27,12 @@ async def process_if_numbers(message: Message, numbers: list[int]):
     await message.answer(
             text=f'Нашел: {", ".join(str(num) for num in numbers)}')
 
+
+async def process_if_not_numbers(message: Message):
+    await message.answer(
+            text='Не нашел что-то :(')
+
+
 # for all messages must be last
 async def send_echo(message: Message):
     await message.reply(text=message.text)
@@ -33,10 +40,14 @@ async def send_echo(message: Message):
 
 
 # register all handlers
-def handlers_messages_register(dp: Dispatcher):
+def setup(dp: Dispatcher):
     dp.message.register(send_photo_echo, F.content_type == ContentType.PHOTO)
     dp.message.register(send_voice_echo, F.content_type == ContentType.VOICE)
     dp.message.register(send_video_echo, F.content_type == ContentType.VIDEO)
     dp.message.register(send_document_echo, F.content_type == ContentType.DOCUMENT)
-    dp.message.register(process_if_numbers, F.Text(startwith='найди числа', ignore_case=True))
+    dp.message.register(process_if_numbers, Text(startswith='найди числа', ignore_case=True),
+            NumbersInMessage())
+    dp.message.register(process_if_not_numbers, Text(startswith='найди числа', ignore_case=True))
+
+
     dp.message.register(send_echo)
