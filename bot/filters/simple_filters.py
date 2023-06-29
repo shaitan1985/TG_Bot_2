@@ -1,5 +1,7 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
+from dateparser.search import search_dates
+from datetime import datetime
 
 
 class NumbersInMessage(BaseFilter):
@@ -17,3 +19,12 @@ class NumbersInMessage(BaseFilter):
         if numbers:
             return {'numbers': numbers}
         return False
+
+class DateInMessage(BaseFilter):
+    async def __call__(self, message: Message) -> bool | list[tuple[str, datetime, str]]:
+        times: list = search_dates(message.text)
+        if times:
+            return {'times': times}
+        return False
+
+
