@@ -1,35 +1,35 @@
-from envparse import env
+from dataclasses import dataclass
+from environs import Env
 
-env.read_envfile()
 
-# BOT
-TELEGRAM_BOT_TOKEN = env.str('TELEGRAM_BOT_TOKEN')
-SKIP_UPDATES = env.bool('SKIP_UPDATES')
-LOGFILE = env.str('LOGFILE')
+@dataclass
+class DatabaseConfig:
+    database: str         # Название базы данных
+    db_host: str          # URL-адрес базы данных
+    db_user: str          # Username пользователя базы данных
+    db_password: str      # Пароль к базе данных
 
-OWNER_ID = env.int('OWNER_ID')
 
-# APP
-APP_HOST = env.str('APP_HOST', default='localhost')
-APP_PORT = env.int('APP_PORT', default=5000)
+@dataclass
+class TgBot:
+    token: str            # Токен для доступа к телеграм-боту
+    admin_ids: list[int]  # Список id администраторов бота
 
-# REDIS
-REDIS_HOST = env.str('REDIS_HOST', default='localhost')
-REDIS_PORT = env.int('REDIS_PORT', default=6379)
 
-# WEBHOOK
-WEBHOOK_USE = env.bool('WEBHOOK_USE')
-WEBHOOK_HOST = env.str('WEBHOOK_HOST')
-WEBHOOK_PATH = env.str('WEBHOOK_PATH')
-WEBHOOK_PORT = env.int('WEBHOOK_PORT')
+@dataclass
+class Config:
+   tg_bot: TgBot
+   db: DatabaseConfig
 
-# DATABASE
-POSTGRES_HOST = env.str('POSTGRES_HOST', default='localhost')
-POSTGRES_PORT = env.int('DB_PORT', default=5432)
-POSTGRES_USER = env.str('POSTGRES_USER', default='postgres')
-POSTGRES_PASSWORD = env.str('POSTGRES_PASSWORD', default=None)
-POSTGRES_DB = env.str('POSTGRES_DB')
 
-# WEBHOOK INIT
-WEBHOOK_URL = f'https://{WEBHOOK_HOST}:{WEBHOOK_PORT}{WEBHOOK_PATH}'
-WEBHOOK_SERVER = {'host': APP_HOST, 'port': APP_PORT}
+def load_config(path: str | None) -> Config:
+    env: Env = Env()
+    env.read_env(path)
+
+    return Config(tg_bot=TgBot(token=env('BOT_TOKEN'),
+                               admin_ids=list(map(int, env.list('ADMIN_IDS')))),
+                  db=DatabaseConfig(database=env('DATABASE'),
+                                    db_host=env('DB_HOST'),
+                                    db_user=env('DB_USER'),
+                                    db_password=env('DB_PASSWORD')))
+

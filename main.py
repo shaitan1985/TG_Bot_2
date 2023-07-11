@@ -1,14 +1,24 @@
-from aiogram import Bot, Dispatcher
-from aiogram.types import Message
+import asyncio
 
-import config
-from bot.handlers import commands, messages
-# Bot object and dispatcher
-bot: Bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
-dp: Dispatcher = Dispatcher()
+from aiogram import Bot, Dispatcher
+from bot.handlers import messages, commands
+from config import Config, load_config
+
+
+async def main() -> None:
+    # Bot object and dispatcher
+    config: Config = load_config('.env')
+    bot: Bot = Bot(token=config.tg_bot.token)
+    dp: Dispatcher = Dispatcher()
+
+    # Регистриуем роутеры в диспетчере
+    dp.include_router(messages.router)
+    dp.include_router(commands.router)
+
+
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
 
 
 if __name__ == '__main__':
-    commands.handlers_commands_register(dp=dp)
-    messages.handlers_messages_register(dp=dp)
-    dp.run_polling(bot)
+    asyncio.run(main())
